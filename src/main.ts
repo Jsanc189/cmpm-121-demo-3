@@ -1,10 +1,11 @@
 import "./style.css";
-const controlPanel: HTMLDivElement = document.querySelector("#controlPanel")!;
+const map: HTMLDivElement = document.querySelector("#map")!;
 
+//button placement for workability
 const button = document.createElement("button");
-button.innerHTML = "Click me";
+button.innerText = "Click me";
+button.id = "button";
 button.addEventListener("click", () => {
-  //I want it to say you clicked me on the screen
-  document.body.innerHTML = "You clicked me";
+  button.innerText = "You clicked me";
 });
-controlPanel.append(button);
+map.append(button);
