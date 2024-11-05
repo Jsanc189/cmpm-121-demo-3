@@ -18,7 +18,8 @@ interface Cell {
 }
 
 //location set to Oakes Classroom
-const LOCATION = leaflet.latLng(36.98949379578401, -122.06277128548504);
+const playerCell: Cell = { i: 36.98949379578401, j: -122.06277128548504 };
+const LOCATION = leaflet.latLng(playerCell.i, playerCell.j);
 
 //Gameplay map variables
 const ZOOM_LEVEL = 18;
@@ -44,3 +45,7 @@ leaflet
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   })
   .addTo(map);
+
+const playerMarker = leaflet.marker(LOCATION);
+playerMarker.bindTooltip("You are here");
+playerMarker.addTo(map);
