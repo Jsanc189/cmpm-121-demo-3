@@ -13,15 +13,18 @@ import luck from "./luck.ts";
 
 //create cell interface for mapping
 interface Cell {
-  readonly i: number;
-  readonly j: number;
+  readonly column: number;
+  readonly row: number;
 }
 
 //location set to Oakes Classroom
-const playerCell: Cell = { i: 36.98949379578401, j: -122.06277128548504 };
-const LOCATION = leaflet.latLng(playerCell.i, playerCell.j);
+const playerCell: Cell = {
+  column: 36.98949379578401,
+  row: -122.06277128548504,
+};
+const LOCATION = leaflet.latLng(playerCell.column, playerCell.row);
 
-//Gameplay map variables
+//Gameplay map constants
 const ZOOM_LEVEL = 18;
 const TILE_DEGREES = 1E-4;
 const NEIGHBORHOOD_SIZE = 8;
@@ -56,28 +59,28 @@ const statusPanel = document.querySelector("#statusPanel")!; // defined in index
 statusPanel.textContent = `Points: ${playerPoints}`;
 
 //interface of coins that holds a cell and points (for now)
-interface Coins {
+interface Coin {
   readonly cell: Cell;
   readonly coins: number;
 }
 
 // inface of cache that holds coins
 interface Cache {
-  readonly coins: Coins[];
+  readonly coins: Coin[];
 }
 
-//add caches tot he map with cells
+//add caches to the map with cells
 function spawnCache(newCell: Cell) {
   const origin = LOCATION;
   const offset = 1;
   const bounds = leaflet.latLngBounds([
     [
-      origin.lat + newCell.i * TILE_DEGREES,
-      origin.lng + newCell.j * TILE_DEGREES,
+      origin.lat + newCell.column * TILE_DEGREES,
+      origin.lng + newCell.row * TILE_DEGREES,
     ],
     [
-      origin.lat + (newCell.i + offset) * TILE_DEGREES,
-      origin.lng + (newCell.j + offset) * TILE_DEGREES,
+      origin.lat + (newCell.column + offset) * TILE_DEGREES,
+      origin.lng + (newCell.row + offset) * TILE_DEGREES,
     ],
   ]);
 
@@ -85,16 +88,17 @@ function spawnCache(newCell: Cell) {
   const rect = leaflet.rectangle(bounds);
   rect.addTo(map);
 
+  //generate cache interactions
   rect.bindPopup(() => {
     //Each Cache has a random point value, mutable by the player
     let pointValue = Math.floor(
-      luck([newCell.i, newCell.j, "initialValue"].toString()) * 100,
+      luck([newCell.column, newCell.row, "initialValue"].toString()) * 100,
     );
 
-    //popup description and button
+    //popup description and buttons
     const popUp = document.createElement("div");
     popUp.innerHTML =
-      `<div>You found a cache! Location: ${newCell.i}, ${newCell.j}.  Points: <span id="value">${pointValue}</span></div>
+      `<div>You found a cache! Location: ${newCell.column}, ${newCell.row}.  Points: <span id="value">${pointValue}</span></div>
         <button id="collectButton">Collect</button>
         <button id="depositButton">Deposit</button>`;
 
@@ -109,6 +113,7 @@ function spawnCache(newCell: Cell) {
         statusPanel.innerHTML = `Points: ${playerPoints}`;
       });
 
+    //clicking button increments cache value and decrements player points
     popUp
       .querySelector<HTMLButtonElement>("#depositButton")!
       .addEventListener("click", () => {
@@ -126,7 +131,15 @@ function spawnCache(newCell: Cell) {
 for (let i = -NEIGHBORHOOD_SIZE; i <= NEIGHBORHOOD_SIZE; i++) {
   for (let j = -NEIGHBORHOOD_SIZE; j <= NEIGHBORHOOD_SIZE; j++) {
     if (luck([i, j].toString()) < CACHE_SPAWN_PROBABILITY) {
-      spawnCache({ i, j });
+      spawnCache({ column: i, row: j });
     }
   }
 }
+
+// function collect(coin: Coin, cell: Cell){
+//     return;
+// }
+
+// function deposit(coinn: Coin, cell: Cell){
+//     return;
+// }
