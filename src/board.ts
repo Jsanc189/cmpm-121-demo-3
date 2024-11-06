@@ -30,7 +30,7 @@ export class Board {
     return this.knownCells.get(key)!;
   }
 
-  //returns the cell that the player is currently in
+  //returns the cell that the player is looking at
   getCellForPoint(point: leaflet.Point): Cell {
     return this.getCanonicalCell({
       column: Math.floor(point.x / this.tileWidth),
