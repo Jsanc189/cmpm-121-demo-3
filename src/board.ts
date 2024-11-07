@@ -42,11 +42,14 @@ export class Board {
   getCellBounds(cell: Cell): leaflet.LatLngBounds {
     const column = cell.column;
     const row = cell.row;
-    const SouthWest = { x: column * this.tileWidth, y: row * this.tileWidth };
-    const NorthEast = {
-      x: (column + 1) * this.tileWidth,
-      y: (row + 1) * this.tileWidth,
-    };
+    const SouthWest = leaflet.latLng(
+      column * this.tileWidth,
+      row * this.tileWidth,
+    );
+    const NorthEast = leaflet.latLng(
+      (column + 1) * this.tileWidth,
+      (row + 1) * this.tileWidth,
+    );
     return leaflet.latLngBounds(SouthWest, NorthEast);
   }
 
