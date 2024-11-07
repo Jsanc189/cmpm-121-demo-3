@@ -27,10 +27,9 @@ const LOCATION = leaflet.latLng(playerCell[0], playerCell[1]);
 
 //Gameplay map constants
 const ZOOM_LEVEL = 18;
-//const TILE_DEGREES = 1E-4;
+const TILE_DEGREES = 1E-4;
 const NEIGHBORHOOD_SIZE = 8;
 const CACHE_SPAWN_PROBABILITY = 0.1;
-const TILE_WIDTH = 0.0001;
 
 //create a map
 const map = leaflet.map(document.getElementById("map")!, {
@@ -73,7 +72,7 @@ interface Cache {
 
 //add caches to the map with cells
 function spawnCache(newCell: Cell) {
-  const bounds = board.getCellBounds(newCell);
+  const bounds = board.getCellBounds(newCell, LOCATION);
   console.log(bounds);
 
   //adds rectangle to map
@@ -120,7 +119,7 @@ function spawnCache(newCell: Cell) {
 }
 
 //add a board
-const board = new Board(TILE_WIDTH, NEIGHBORHOOD_SIZE);
+const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
 const cells = board.getCellsNearPoint(LOCATION);
 console.log(cells);
 

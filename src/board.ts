@@ -39,18 +39,23 @@ export class Board {
   }
 
   //returns the bounds of the cell
-  getCellBounds(cell: Cell): leaflet.LatLngBounds {
+  getCellBounds(cell: Cell, originCell: leaflet.latLng): leaflet.LatLngBounds {
+    const offsett = 1;
     const column = cell.column;
     const row = cell.row;
-    const SouthWest = leaflet.latLng(
-      column * this.tileWidth,
-      row * this.tileWidth,
-    );
-    const NorthEast = leaflet.latLng(
-      (column + 1) * this.tileWidth,
-      (row + 1) * this.tileWidth,
-    );
-    return leaflet.latLngBounds(SouthWest, NorthEast);
+
+    const bounds = leaflet.latLngBounds([
+      [
+        originCell.lat + column * this.tileWidth,
+        originCell.lng + row * this.tileWidth,
+      ],
+      [
+        originCell.lat + (column + offsett) * this.tileWidth,
+        originCell.lng + (row + offsett) * this.tileWidth,
+      ],
+    ]);
+
+    return leaflet.latLngBounds(bounds);
   }
 
   //returns the cells that are within the visibility radius of the player
