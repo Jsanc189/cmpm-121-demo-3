@@ -22,7 +22,8 @@ export class Board {
 
   //ensures that the cells are unique
   private getCanonicalCell(cell: Cell): Cell {
-    const key = cell.toString();
+    const { column, row } = cell;
+    const key = [column, row].toString();
     if (!this.knownCells.has(key)) {
       this.knownCells.set(key, cell);
     }

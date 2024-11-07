@@ -132,13 +132,14 @@ function spawnCache(newCell: Cell) {
 //add a board
 const board = new Board(TILE_WIDTH, NEIGHBORHOOD_SIZE);
 const cells = board.getCellsNearPoint(LOCATION);
-console.log(board.getCellsNearPoint(LOCATION));
+console.log(cells);
 
 // iterate through the cells object  check luck of each cell to spawn cache
 for (let i = 0; i < cells.length; i++) {
   if (
     luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
   ) {
+    //console.log("i'm lucky");
     spawnCache(cells[i]);
   }
 }
