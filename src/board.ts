@@ -22,25 +22,25 @@ export class Board {
 
   //ensures that the cells are unique
   private getCanonicalCell(cell: Cell): Cell {
-    const { column, row } = cell;
-    const key = [column, row].toString();
+    const key = cell.toString();
     if (!this.knownCells.has(key)) {
-      this.knownCells.set(key, { column, row });
+      this.knownCells.set(key, cell);
     }
     return this.knownCells.get(key)!;
   }
 
   //returns the cell that the player is looking at
-  getCellForPoint(point: leaflet.Point): Cell {
+  getCellForPoint(point: leaflet.latLng): Cell {
     return this.getCanonicalCell({
-      column: Math.floor(point.x / this.tileWidth),
-      row: Math.floor(point.y / this.tileWidth),
+      column: point.lat,
+      row: point.lng,
     });
   }
 
   //returns the bounds of the cell
   getCellBounds(cell: Cell): leaflet.LatLngBounds {
-    const { column, row } = cell;
+    const column = cell.column;
+    const row = cell.row;
     const SouthWest = { x: column * this.tileWidth, y: row * this.tileWidth };
     const NorthEast = {
       x: (column + 1) * this.tileWidth,
@@ -50,10 +50,11 @@ export class Board {
   }
 
   //returns the cells that are within the visibility radius of the player
-  getCellsNearPoint(point: leaflet.Point): Cell[] {
+  getCellsNearPoint(point: leaflet.latLng): Cell[] {
     const resultCells: Cell[] = [];
     const originCell = this.getCellForPoint(point);
-    const { column, row } = originCell;
+    const column = originCell.column;
+    const row = originCell.row;
 
     for (
       let columnDistance = -this.tileVisibilityRadius;

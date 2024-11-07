@@ -12,7 +12,7 @@ import "./leafletWorkaround.ts";
 import luck from "./luck.ts";
 
 // import board.ts
-//import { Board } from "./board.ts";
+import { Board } from "./board.ts";
 
 //create cell interface for mapping
 interface Cell {
@@ -30,7 +30,7 @@ const ZOOM_LEVEL = 18;
 const TILE_DEGREES = 1E-4;
 const NEIGHBORHOOD_SIZE = 8;
 const CACHE_SPAWN_PROBABILITY = 0.1;
-//const TILE_WIDTH = 0.0001;
+const TILE_WIDTH = 0.0001;
 
 //create a map
 const map = leaflet.map(document.getElementById("map")!, {
@@ -129,28 +129,28 @@ function spawnCache(newCell: Cell) {
   });
 }
 
-// //add a board
-// const board = new Board(TILE_WIDTH, NEIGHBORHOOD_SIZE);
-// const cells = board.getCellsNearPoint(LOCATION);
-// //console.log(board.getCellsNearPoint(LOCATION));
+//add a board
+const board = new Board(TILE_WIDTH, NEIGHBORHOOD_SIZE);
+const cells = board.getCellsNearPoint(LOCATION);
+console.log(board.getCellsNearPoint(LOCATION));
 
-// // iterate through the cells object  check luck of each cell to spawn cache
-// for (let i = 0; i < cells.length; i++) {
-//   if (
-//     luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
-//   ) {
-//     spawnCache(cells[i]);
-//   }
-// }
-
-// check player location and find caches 10% of the time
-for (let i = -NEIGHBORHOOD_SIZE; i <= NEIGHBORHOOD_SIZE; i++) {
-  for (let j = -NEIGHBORHOOD_SIZE; j <= NEIGHBORHOOD_SIZE; j++) {
-    if (luck([i, j].toString()) < CACHE_SPAWN_PROBABILITY) {
-      spawnCache({ column: i, row: j });
-    }
+// iterate through the cells object  check luck of each cell to spawn cache
+for (let i = 0; i < cells.length; i++) {
+  if (
+    luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
+  ) {
+    spawnCache(cells[i]);
   }
 }
+
+// // check player location and find caches 10% of the time
+// for (let i = -NEIGHBORHOOD_SIZE; i <= NEIGHBORHOOD_SIZE; i++) {
+//   for (let j = -NEIGHBORHOOD_SIZE; j <= NEIGHBORHOOD_SIZE; j++) {
+//     if (luck([i, j].toString()) < CACHE_SPAWN_PROBABILITY) {
+//       spawnCache({ column: i, row: j });
+//     }
+//   }
+// }
 
 // function collect(coin: Coin, cell: Cell){
 //     return;
