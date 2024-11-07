@@ -73,7 +73,7 @@ interface Cache {
 //add caches to the map with cells
 function spawnCache(newCell: Cell) {
   const bounds = board.getCellBounds(newCell, LOCATION);
-  console.log(bounds);
+  //console.log(bounds);
 
   //adds rectangle to map
   const rect = leaflet.rectangle(bounds);
@@ -121,7 +121,7 @@ function spawnCache(newCell: Cell) {
 //add a board
 const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
 const cells = board.getCellsNearPoint(LOCATION);
-console.log(cells);
+//console.log(cells);
 
 // iterate through the cells object  check luck of each cell to spawn cache
 for (let i = 0; i < cells.length; i++) {
