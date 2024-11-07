@@ -12,7 +12,7 @@ import "./leafletWorkaround.ts";
 import luck from "./luck.ts";
 
 // import board.ts
-import { Board } from "./board.ts";
+//import { Board } from "./board.ts";
 
 //create cell interface for mapping
 interface Cell {
@@ -21,18 +21,16 @@ interface Cell {
 }
 
 //location set to Oakes Classroom
-const playerCell: Cell = {
-  column: 36.98949379578401,
-  row: -122.06277128548504,
-};
-const LOCATION = leaflet.latLng(playerCell.column, playerCell.row);
+const playerCell = [36.98949379578401, -122.06277128548504];
+
+const LOCATION = leaflet.latLng(playerCell[0], playerCell[1]);
 
 //Gameplay map constants
 const ZOOM_LEVEL = 18;
 const TILE_DEGREES = 1E-4;
 const NEIGHBORHOOD_SIZE = 8;
 const CACHE_SPAWN_PROBABILITY = 0.1;
-const TILE_WIDTH = 0.0001;
+//const TILE_WIDTH = 0.0001;
 
 //create a map
 const map = leaflet.map(document.getElementById("map")!, {
@@ -131,32 +129,28 @@ function spawnCache(newCell: Cell) {
   });
 }
 
-//add a board
-const board = new Board(TILE_WIDTH, NEIGHBORHOOD_SIZE);
-const cells = board.getCellsNearPoint(playerCell);
-console.log(board.getCellsNearPoint(playerCell));
-console.log(typeof cells);
-console.log(typeof cells[0]);
-console.log(typeof cells[0].column);
+// //add a board
+// const board = new Board(TILE_WIDTH, NEIGHBORHOOD_SIZE);
+// const cells = board.getCellsNearPoint(LOCATION);
+// //console.log(board.getCellsNearPoint(LOCATION));
 
-// iterate through the cells object  check luck of each cell to spawn cache
-for (let i = 0; i < cells.length; i++) {
-  if (
-    luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
-  ) {
-    spawnCache(cells[i]);
-    console.log("cache spawned");
-  }
-}
-
-// check player location and find caches 10% of the time
-// for (let i = -NEIGHBORHOOD_SIZE; i <= NEIGHBORHOOD_SIZE; i++) {
-//   for (let j = -NEIGHBORHOOD_SIZE; j <= NEIGHBORHOOD_SIZE; j++) {
-//     if (luck([i, j].toString()) < CACHE_SPAWN_PROBABILITY) {
-//       spawnCache({ column: i, row: j });
-//     }
+// // iterate through the cells object  check luck of each cell to spawn cache
+// for (let i = 0; i < cells.length; i++) {
+//   if (
+//     luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
+//   ) {
+//     spawnCache(cells[i]);
 //   }
 // }
+
+// check player location and find caches 10% of the time
+for (let i = -NEIGHBORHOOD_SIZE; i <= NEIGHBORHOOD_SIZE; i++) {
+  for (let j = -NEIGHBORHOOD_SIZE; j <= NEIGHBORHOOD_SIZE; j++) {
+    if (luck([i, j].toString()) < CACHE_SPAWN_PROBABILITY) {
+      spawnCache({ column: i, row: j });
+    }
+  }
+}
 
 // function collect(coin: Coin, cell: Cell){
 //     return;
