@@ -1,8 +1,9 @@
 //inspired by Mako1688 :https://github.com/Mako1688/cmpm-121-demo-3/blob/main/src/board.ts
+//inpsired by akhalim1 :https://github.com/akhalim1/cmpm121-demo-3/blob/main/src/board.ts
 
 import leaflet from "leaflet";
 
-interface Cell {
+export interface Cell {
   readonly column: number;
   readonly row: number;
 }
@@ -32,26 +33,26 @@ export class Board {
 
   //returns the cell that the player is looking at
   getCellForPoint(point: leaflet.latLng): Cell {
-    return this.getCanonicalCell({
-      column: point.lat,
-      row: point.lng,
-    });
+    const column = Math.floor(point.lat / this.tileWidth);
+    const row = Math.floor(point.lng / this.tileWidth);
+    return this.getCanonicalCell({ column, row });
   }
 
   //returns the bounds of the cell
-  getCellBounds(cell: Cell, originCell: leaflet.latLng): leaflet.LatLngBounds {
+  getCellBounds(cell: Cell): leaflet.LatLngBounds {
     const offsett = 1;
     const column = cell.column;
     const row = cell.row;
+    console.log(column, row);
 
     const bounds = leaflet.latLngBounds([
       [
-        originCell.lat + column * this.tileWidth,
-        originCell.lng + row * this.tileWidth,
+        column * this.tileWidth,
+        row * this.tileWidth,
       ],
       [
-        originCell.lat + (column + offsett) * this.tileWidth,
-        originCell.lng + (row + offsett) * this.tileWidth,
+        (column + offsett) * this.tileWidth,
+        (row + offsett) * this.tileWidth,
       ],
     ]);
 

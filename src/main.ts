@@ -72,8 +72,9 @@ interface Cache {
 
 //add caches to the map with cells
 function spawnCache(newCell: Cell) {
-  const bounds = board.getCellBounds(newCell, LOCATION);
-  //console.log(bounds);
+  const bounds = board.getCellBounds(newCell);
+  console.log("bounds:");
+  console.log(bounds);
 
   //adds rectangle to map
   const rect = leaflet.rectangle(bounds);
