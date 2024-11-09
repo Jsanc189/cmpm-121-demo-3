@@ -43,7 +43,7 @@ export class Board {
     const offsett = 1;
     const column = cell.column;
     const row = cell.row;
-    console.log(column, row);
+    //console.log(column, row);
 
     const bounds = leaflet.latLngBounds([
       [

@@ -22,6 +22,7 @@ interface Cell {
 
 //location set to Oakes Classroom
 const playerCell = [36.98949379578401, -122.06277128548504];
+//const playerCell = [0,0];
 
 const LOCATION = leaflet.latLng(playerCell[0], playerCell[1]);
 
@@ -55,14 +56,14 @@ playerMarker.bindTooltip("You are here");
 playerMarker.addTo(map);
 
 //Display  player points
-let playerPoints = 0;
+const playerPoints: Array<Coin> = [];
 const statusPanel = document.querySelector("#statusPanel")!; // defined in index.html
 statusPanel.textContent = `Points: ${playerPoints}`;
 
 //interface of coins that holds a cell and points (for now)
 interface Coin {
   readonly cell: Cell;
-  readonly coins: number;
+  readonly serial: number;
 }
 
 // inface of cache that holds coins
@@ -73,8 +74,8 @@ interface Cache {
 //add caches to the map with cells
 function spawnCache(newCell: Cell) {
   const bounds = board.getCellBounds(newCell);
-  console.log("bounds:");
-  console.log(bounds);
+  // console.log("bounds:");
+  // console.log(bounds);
 
   //adds rectangle to map
   const rect = leaflet.rectangle(bounds);
@@ -83,14 +84,22 @@ function spawnCache(newCell: Cell) {
   //generate cache interactions
   rect.bindPopup(() => {
     //Each Cache has a random point value, mutable by the player
-    let pointValue = Math.floor(
+    let numCoins = Math.floor(
       luck([newCell.column, newCell.row, "initialValue"].toString()) * 100,
     );
+    const serlializedCoins: Array<Coin> = [];
+
+    //create new serialized coin and add to list
+    for (let i = 0; i < numCoins; i++) {
+      const newCoin: Coin = { cell: newCell, serial: i };
+      serlializedCoins.push(newCoin);
+      //console.log(serlializedCoins);
+    }
 
     //popup description and buttons
     const popUp = document.createElement("div");
     popUp.innerHTML =
-      `<div>You found a cache! Location: ${newCell.column}, ${newCell.row}.  Points: <span id="value">${pointValue}</span></div>
+      `<div>You found a cache! Location: ${newCell.column}, ${newCell.row}.  Number of Coins: <span id="value"> ${numCoins} </span></div>
         <button id="collectButton">Collect</button>
         <button id="depositButton">Deposit</button>`;
 
@@ -98,10 +107,10 @@ function spawnCache(newCell: Cell) {
     popUp
       .querySelector<HTMLButtonElement>("#collectButton")!
       .addEventListener("click", () => {
-        pointValue--;
+        numCoins--;
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
-          `Points: ${pointValue}`;
-        playerPoints++;
+          `${numCoins}`;
+        playerPoints;
         statusPanel.innerHTML = `Points: ${playerPoints}`;
       });
 
@@ -109,10 +118,10 @@ function spawnCache(newCell: Cell) {
     popUp
       .querySelector<HTMLButtonElement>("#depositButton")!
       .addEventListener("click", () => {
-        pointValue++;
+        numCoins++;
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
-          `Points: ${pointValue}`;
-        playerPoints--;
+          `${numCoins}`;
+        //playerPoints--;
         statusPanel.innerHTML = `Points: ${playerPoints}`;
       });
     return popUp;
