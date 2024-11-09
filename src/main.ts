@@ -58,7 +58,7 @@ playerMarker.addTo(map);
 //Display  player points
 const playerPoints: Array<Coin> = [];
 const statusPanel = document.querySelector("#statusPanel")!; // defined in index.html
-statusPanel.textContent = `Points: ${playerPoints}`;
+statusPanel.textContent = `Coins: ${playerPoints.length}`;
 
 //interface of coins that holds a cell and points (for now)
 interface Coin {
@@ -90,10 +90,9 @@ function spawnCache(newCell: Cell) {
     const serlializedCoins: Array<Coin> = [];
 
     //create new serialized coin and add to list
-    for (let i = 0; i < numCoins; i++) {
+    for (let i = numCoins; i > 0; i--) {
       const newCoin: Coin = { cell: newCell, serial: i };
       serlializedCoins.push(newCoin);
-      //console.log(serlializedCoins);
     }
 
     //popup description and buttons
@@ -108,10 +107,12 @@ function spawnCache(newCell: Cell) {
       .querySelector<HTMLButtonElement>("#collectButton")!
       .addEventListener("click", () => {
         numCoins--;
+        playerPoints.push(serlializedCoins.pop()!);
+        const serial = coinName(playerPoints[playerPoints.length - 1]);
+        //console.log(playerPoints, serlializedCoins);
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
           `${numCoins}`;
-        playerPoints;
-        statusPanel.innerHTML = `Points: ${playerPoints}`;
+        statusPanel.innerHTML = `Coin Collected: ${serial}`;
       });
 
     //clicking button increments cache value and decrements player points
@@ -119,10 +120,11 @@ function spawnCache(newCell: Cell) {
       .querySelector<HTMLButtonElement>("#depositButton")!
       .addEventListener("click", () => {
         numCoins++;
+        serlializedCoins.push(playerPoints.pop()!);
+        const serial = coinName(serlializedCoins[serlializedCoins.length - 1]);
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
           `${numCoins}`;
-        //playerPoints--;
-        statusPanel.innerHTML = `Points: ${playerPoints}`;
+        statusPanel.innerHTML = `Coin Deposited: ${serial}`;
       });
     return popUp;
   });
@@ -139,4 +141,8 @@ for (let i = 0; i < cells.length; i++) {
   ) {
     spawnCache(cells[i]);
   }
+}
+
+function coinName(coin: Coin) {
+  return `${coin.cell.column}:-${coin.cell.row}#${coin.serial}`;
 }
