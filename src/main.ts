@@ -122,31 +122,12 @@ function spawnCache(newCell: Cell) {
 //add a board
 const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
 const cells = board.getCellsNearPoint(LOCATION);
-//console.log(cells);
 
 // iterate through the cells object  check luck of each cell to spawn cache
 for (let i = 0; i < cells.length; i++) {
   if (
     luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
   ) {
-    //console.log("i'm lucky");
     spawnCache(cells[i]);
   }
 }
-
-// // check player location and find caches 10% of the time
-// for (let i = -NEIGHBORHOOD_SIZE; i <= NEIGHBORHOOD_SIZE; i++) {
-//   for (let j = -NEIGHBORHOOD_SIZE; j <= NEIGHBORHOOD_SIZE; j++) {
-//     if (luck([i, j].toString()) < CACHE_SPAWN_PROBABILITY) {
-//       spawnCache({ column: i, row: j });
-//     }
-//   }
-// }
-
-// function collect(coin: Coin, cell: Cell){
-//     return;
-// }
-
-// function deposit(coinn: Coin, cell: Cell){
-//     return;
-// }

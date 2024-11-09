@@ -8,6 +8,13 @@ permissions:
   pages: write
   id-token: write
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:deno-version:v2.x
   check:
     runs-on: ubuntu-latest
     steps:
