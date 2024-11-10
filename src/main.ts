@@ -146,3 +146,5 @@ for (let i = 0; i < cells.length; i++) {
 function coinName(coin: Coin) {
   return `${coin.cell.column}:-${coin.cell.row}#${coin.serial}`;
 }
+
+//testing
