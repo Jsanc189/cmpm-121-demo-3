@@ -146,3 +146,29 @@ for (let i = 0; i < cells.length; i++) {
 function coinName(coin: Coin) {
   return `${coin.cell.column}:-${coin.cell.row}#${coin.serial}`;
 }
+
+function playerMoved(column: number, row: number) {
+  LOCATION.lat += column;
+  LOCATION.lng += row;
+  playerMarker.setLatLng(LOCATION);
+  console.log(LOCATION);
+}
+
+function game() {
+  document.getElementById("north")?.addEventListener("click", () => {
+    playerMoved(TILE_DEGREES, 0);
+  });
+
+  document.getElementById("south")?.addEventListener("click", () => {
+    playerMoved(-TILE_DEGREES, 0);
+  });
+
+  document.getElementById("east")?.addEventListener("click", () => {
+    playerMoved(0, TILE_DEGREES);
+  });
+
+  document.getElementById("west")?.addEventListener("click", () => {
+    playerMoved(0, -TILE_DEGREES);
+  });
+}
+game();
