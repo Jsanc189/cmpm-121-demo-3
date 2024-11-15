@@ -71,38 +71,11 @@ interface Cache {
   readonly coins: Coin[];
 }
 
-//memento interface to save Geocaches
-interface Memento<T> {
-  toMemento(): T;
-  fromMemento(memento: T): void;
-}
-
-//class for Geocaches
-class Geocache implements Memento<string> {
-  column: number;
-  row: number;
-  numCoins: number;
-
-  constructor() {
-    this.column = 0;
-    this.row = 1;
-    this.numCoins = 2;
-  }
-
-  //saves caches state
-  toMemento() {
-    return this.numCoins.toString();
-  }
-
-  //restores caches state
-  fromMemento(memento: string): void {
-    this.numCoins = parseInt(memento);
-  }
-}
-
 //add caches to the map with cells
 function spawnCache(newCell: Cell) {
   const bounds = board.getCellBounds(newCell);
+  // console.log("bounds:");
+  // console.log(bounds);
 
   //adds rectangle to map
   const rect = leaflet.rectangle(bounds);
@@ -110,6 +83,7 @@ function spawnCache(newCell: Cell) {
 
   //generate cache interactions
   rect.bindPopup(() => {
+    //Each Cache has a random point value, mutable by the player
     let numCoins = Math.floor(
       luck([newCell.column, newCell.row, "initialValue"].toString()) * 100,
     );
@@ -135,6 +109,7 @@ function spawnCache(newCell: Cell) {
         numCoins--;
         playerPoints.push(serlializedCoins.pop()!);
         const serial = coinName(playerPoints[playerPoints.length - 1]);
+        //console.log(playerPoints, serlializedCoins);
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
           `${numCoins}`;
         statusPanel.innerHTML = `Coin Collected: ${serial}`;
@@ -157,30 +132,14 @@ function spawnCache(newCell: Cell) {
 
 //add a board
 const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
-let cells = board.getCellsNearPoint(LOCATION);
-const Geocaches: Geocache[] = [];
+const cells = board.getCellsNearPoint(LOCATION);
 
-function makeCacheCells() {
-  cells = board.getCellsNearPoint(LOCATION);
-  // iterate through the cells object  check luck of each cell to spawn cache
-  for (let i = 0; i < cells.length; i++) {
-    if (
-      luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
-    ) {
-      spawnCache(cells[i]);
-      // if geocache is not in Geocaches list
-      if (
-        !Geocaches.some((cache) =>
-          cache.column === cells[i].column && cache.row === cells[i].row
-        )
-      ) {
-        //create new cache and add to list
-        const newCache = new Geocache();
-        newCache.column = cells[i].column;
-        newCache.row = cells[i].row;
-        Geocaches.push(newCache);
-      }
-    }
+// iterate through the cells object  check luck of each cell to spawn cache
+for (let i = 0; i < cells.length; i++) {
+  if (
+    luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
+  ) {
+    spawnCache(cells[i]);
   }
 }
 
@@ -195,76 +154,21 @@ function playerMoved(column: number, row: number) {
   console.log(LOCATION);
 }
 
-//function that removes rectangles and caches from map
-function removeCaches() {
-  map.eachLayer((layer) => {
-    if (layer instanceof leaflet.Rectangle) {
-      map.removeLayer(layer);
-    }
-  });
-  Geocaches.length = 0;
-}
-
 function game() {
-  makeCacheCells();
   document.getElementById("north")?.addEventListener("click", () => {
     playerMoved(TILE_DEGREES, 0);
-    removeCaches();
-    makeCacheCells();
   });
 
   document.getElementById("south")?.addEventListener("click", () => {
     playerMoved(-TILE_DEGREES, 0);
-    removeCaches();
-    makeCacheCells();
   });
 
   document.getElementById("east")?.addEventListener("click", () => {
     playerMoved(0, TILE_DEGREES);
-    removeCaches();
-    makeCacheCells();
   });
 
   document.getElementById("west")?.addEventListener("click", () => {
     playerMoved(0, -TILE_DEGREES);
-    removeCaches();
-    makeCacheCells();
   });
 }
 game();
-
-// //function that saves the state of the game
-// function saveGame() {
-//   const mementos = saveCaches();
-//   localStorage.setItem("gameState", JSON.stringify(mementos));
-// }
-
-// //function that restores the state of the game
-// function restoreGame() {
-//   const mementos = JSON.parse(localStorage.getItem("gameState") || "[]");
-//   restoreCaches(mementos);
-// }
-
-// //function that resets the game
-// function resetGame() {
-//   removeCaches();
-//   const cells = board.getCellsNearPoint(LOCATION);
-//   for (let i = 0; i < cells.length; i++) {
-//     if (
-//       luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
-//     ) {
-//       spawnCache(cells[i]);
-//       if (!Geocaches.some(cache => cache.column === cells[i].column && cache.row === cells[i].row)) {
-//         const newCache = new Geocache();
-//         newCache.column = cells[i].column;
-//         newCache.row = cells[i].row;
-//         Geocaches.push(newCache);
-//       }
-//     }
-//   }
-// }
-
-// //add event listeners to save, restore, and reset buttons
-// document.getElementById("saveButton")?.addEventListener("click", saveGame);
-// document.getElementById("restoreButton")?.addEventListener("click", restoreGame);
-// document.getElementById("resetButton")?.addEventListener("click", resetGame);
