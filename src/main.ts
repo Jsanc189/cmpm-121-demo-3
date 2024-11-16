@@ -91,42 +91,71 @@ class Geocache implements Memento<string> {
 
   //saves caches state
   toMemento() {
-    return this.numCoins.toString();
+    return `${this.column},${this.row},${this.numCoins}`;
   }
 
   //restores caches state
   fromMemento(memento: string): void {
-    this.numCoins = parseInt(memento);
+    const [column, row, numCoins] = memento.split(",").map(Number);
+    this.column = column;
+    this.row = row;
+    this.numCoins = numCoins;
   }
 }
 
 //add a board
 const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
 let cells = board.getCellsNearPoint(LOCATION);
-const Geocaches: Geocache[] = [];
+const currentGeoCaches: Geocache[] = [];
+const savedMementos: string[] = [];
+
+//iterate through the cells object  check luck of each cell to spawn cache
 
 function makeCacheCells() {
   cells = board.getCellsNearPoint(LOCATION);
-  // iterate through the cells object  check luck of each cell to spawn cache
-  for (let i = 0; i < cells.length; i++) {
+
+  cells.forEach((cell) => {
+    //check if cache already exists for this cell in saved momentos
+    const cacheExists = savedMementos.some((memento) => {
+      //console.log("saved memento: " + memento);
+      //console.log(cell);
+      const [column, row] = memento.split(",").map(Number);
+      return column === cell.column && row === cell.row;
+    });
+
     if (
-      luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
+      !cacheExists &&
+      luck([cell.column, cell.row].toString()) < CACHE_SPAWN_PROBABILITY
     ) {
-      spawnCache(cells[i]);
-      // if geocache is not in Geocaches list
-      if (
-        !Geocaches.some((cache) =>
-          cache.column === cells[i].column && cache.row === cells[i].row
-        )
-      ) {
-        //create new cache and add to list
-        const newCache = new Geocache();
-        newCache.column = cells[i].column;
-        newCache.row = cells[i].row;
-        Geocaches.push(newCache);
+      //if cache does not exist, create a new one
+      const newCache = new Geocache();
+      newCache.column = cell.column;
+      newCache.row = cell.row;
+      newCache.numCoins = Math.floor(
+        luck([cell.column, cell.row].toString()) * 100,
+      );
+
+      //add new cache to the list
+      currentGeoCaches.push(newCache);
+      spawnCache(cell);
+    } else {
+      //find the memento for this cell
+      const memento = savedMementos.find((memento) => {
+        const [column, row] = memento.split(",").map(Number);
+        return column === cell.column && row === cell.row;
+      });
+
+      if (memento) {
+        const [column, row, numCoins] = memento.split(",").map(Number);
+        const existingCache = new Geocache();
+        existingCache.column = column;
+        existingCache.row = row;
+        existingCache.numCoins = numCoins;
+        currentGeoCaches.push(existingCache);
+        spawnCache(cell);
       }
     }
-  }
+  });
 }
 
 //add caches to the map with cells
@@ -137,15 +166,23 @@ function spawnCache(newCell: Cell) {
   const rect = leaflet.rectangle(bounds);
   rect.addTo(map);
 
+  const cache = currentGeoCaches.find(
+    (c) => c.column === newCell.column && c.row === newCell.row,
+  );
+
+  if (!cache) {
+    console.error("Cache not found for cell:", newCell);
+    return;
+  }
+
+  let numCoins = cache.numCoins;
+
   //generate cache interactions
   rect.bindPopup(() => {
-    let numCoins = Math.floor(
-      luck([newCell.column, newCell.row, "initialValue"].toString()) * 100,
-    );
     const serlializedCoins: Array<Coin> = [];
 
     //create new serialized coin and add to list
-    for (let i = numCoins; i > 0; i--) {
+    for (let i = 0; i <= numCoins; i++) {
       const newCoin: Coin = { cell: newCell, serial: i };
       serlializedCoins.push(newCoin);
     }
@@ -162,6 +199,7 @@ function spawnCache(newCell: Cell) {
       .querySelector<HTMLButtonElement>("#collectButton")!
       .addEventListener("click", () => {
         numCoins--;
+        cache.numCoins = numCoins;
         playerPoints.push(serlializedCoins.pop()!);
         const serial = coinName(playerPoints[playerPoints.length - 1]);
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
@@ -174,6 +212,7 @@ function spawnCache(newCell: Cell) {
       .querySelector<HTMLButtonElement>("#depositButton")!
       .addEventListener("click", () => {
         numCoins++;
+        cache.numCoins = numCoins;
         serlializedCoins.push(playerPoints.pop()!);
         const serial = coinName(serlializedCoins[serlializedCoins.length - 1]);
         popUp.querySelector<HTMLSpanElement>("#value")!.innerHTML =
@@ -185,24 +224,30 @@ function spawnCache(newCell: Cell) {
 }
 
 function coinName(coin: Coin) {
-  return `${coin.cell.column}:-${coin.cell.row}#${coin.serial}`;
+  return `${coin.cell.column}:${coin.cell.row}#${coin.serial}`;
 }
 
 //function that removes rectangles and caches from map
+//modify this to make sure this saves cache states that are currently on board and clear board
 function removeCaches() {
+  //for each cache in the screen I want to save memento of it in an savedMementos array
+  currentGeoCaches.forEach((cache) => {
+    savedMementos.push(cache.toMemento());
+  });
+
+  //remove all rectangles from map
   map.eachLayer((layer) => {
     if (layer instanceof leaflet.Rectangle) {
       map.removeLayer(layer);
     }
   });
-  Geocaches.length = 0;
+  currentGeoCaches.length = 0;
 }
 
 function playerMoved(column: number, row: number) {
   LOCATION.lat += column;
   LOCATION.lng += row;
   playerMarker.setLatLng(LOCATION);
-  console.log(LOCATION);
 }
 
 function game() {
