@@ -100,6 +100,35 @@ class Geocache implements Memento<string> {
   }
 }
 
+//add a board
+const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
+let cells = board.getCellsNearPoint(LOCATION);
+const Geocaches: Geocache[] = [];
+
+function makeCacheCells() {
+  cells = board.getCellsNearPoint(LOCATION);
+  // iterate through the cells object  check luck of each cell to spawn cache
+  for (let i = 0; i < cells.length; i++) {
+    if (
+      luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
+    ) {
+      spawnCache(cells[i]);
+      // if geocache is not in Geocaches list
+      if (
+        !Geocaches.some((cache) =>
+          cache.column === cells[i].column && cache.row === cells[i].row
+        )
+      ) {
+        //create new cache and add to list
+        const newCache = new Geocache();
+        newCache.column = cells[i].column;
+        newCache.row = cells[i].row;
+        Geocaches.push(newCache);
+      }
+    }
+  }
+}
+
 //add caches to the map with cells
 function spawnCache(newCell: Cell) {
   const bounds = board.getCellBounds(newCell);
@@ -155,44 +184,8 @@ function spawnCache(newCell: Cell) {
   });
 }
 
-//add a board
-const board = new Board(TILE_DEGREES, NEIGHBORHOOD_SIZE);
-let cells = board.getCellsNearPoint(LOCATION);
-const Geocaches: Geocache[] = [];
-
-function makeCacheCells() {
-  cells = board.getCellsNearPoint(LOCATION);
-  // iterate through the cells object  check luck of each cell to spawn cache
-  for (let i = 0; i < cells.length; i++) {
-    if (
-      luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
-    ) {
-      spawnCache(cells[i]);
-      // if geocache is not in Geocaches list
-      if (
-        !Geocaches.some((cache) =>
-          cache.column === cells[i].column && cache.row === cells[i].row
-        )
-      ) {
-        //create new cache and add to list
-        const newCache = new Geocache();
-        newCache.column = cells[i].column;
-        newCache.row = cells[i].row;
-        Geocaches.push(newCache);
-      }
-    }
-  }
-}
-
 function coinName(coin: Coin) {
   return `${coin.cell.column}:-${coin.cell.row}#${coin.serial}`;
-}
-
-function playerMoved(column: number, row: number) {
-  LOCATION.lat += column;
-  LOCATION.lng += row;
-  playerMarker.setLatLng(LOCATION);
-  console.log(LOCATION);
 }
 
 //function that removes rectangles and caches from map
@@ -203,6 +196,13 @@ function removeCaches() {
     }
   });
   Geocaches.length = 0;
+}
+
+function playerMoved(column: number, row: number) {
+  LOCATION.lat += column;
+  LOCATION.lng += row;
+  playerMarker.setLatLng(LOCATION);
+  console.log(LOCATION);
 }
 
 function game() {
