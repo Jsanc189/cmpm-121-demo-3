@@ -232,39 +232,3 @@ function game() {
   });
 }
 game();
-
-// //function that saves the state of the game
-// function saveGame() {
-//   const mementos = saveCaches();
-//   localStorage.setItem("gameState", JSON.stringify(mementos));
-// }
-
-// //function that restores the state of the game
-// function restoreGame() {
-//   const mementos = JSON.parse(localStorage.getItem("gameState") || "[]");
-//   restoreCaches(mementos);
-// }
-
-// //function that resets the game
-// function resetGame() {
-//   removeCaches();
-//   const cells = board.getCellsNearPoint(LOCATION);
-//   for (let i = 0; i < cells.length; i++) {
-//     if (
-//       luck([cells[i].column, cells[i].row].toString()) < CACHE_SPAWN_PROBABILITY
-//     ) {
-//       spawnCache(cells[i]);
-//       if (!Geocaches.some(cache => cache.column === cells[i].column && cache.row === cells[i].row)) {
-//         const newCache = new Geocache();
-//         newCache.column = cells[i].column;
-//         newCache.row = cells[i].row;
-//         Geocaches.push(newCache);
-//       }
-//     }
-//   }
-// }
-
-// //add event listeners to save, restore, and reset buttons
-// document.getElementById("saveButton")?.addEventListener("click", saveGame);
-// document.getElementById("restoreButton")?.addEventListener("click", restoreGame);
-// document.getElementById("resetButton")?.addEventListener("click", resetGame);
